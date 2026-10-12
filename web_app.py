@@ -31,7 +31,13 @@ try:
         thuat_toan_di_truyen,
         toi_uu_gradient,
     )
+    GA_IMPORT_ERROR = None
 except Exception:
+    GA_IMPORT_ERROR = None
+    try:
+        raise
+    except Exception as ex:
+        GA_IMPORT_ERROR = ex
     ThamSoGA = None
     ga_khoi_luong = ga_phan_tich_gian = thuat_toan_di_truyen = toi_uu_gradient = None
 st.set_page_config(page_title="Đớp Tool", page_icon="🦈", layout="wide")
@@ -1308,7 +1314,11 @@ def _preview_fig(geo, mode_label):
 @st.cache_data(show_spinner=False)
 def _run_ten_bar_ga(pop_size: int, generations: int, runs: int, seed0: int, use_slsqp_polish: bool):
     if any(x is None for x in (ThamSoGA, thuat_toan_di_truyen, ga_khoi_luong, ga_phan_tich_gian)):
-        raise RuntimeError("Không import được file toi_uu_gian_10_thanh_GA_v2.py hoặc thiếu thư viện numpy/scipy/matplotlib.")
+        detail = f" Chi tiết: {GA_IMPORT_ERROR!r}" if GA_IMPORT_ERROR is not None else ""
+        raise RuntimeError(
+            "Không import được file toi_uu_gian_10_thanh_GA_v2.py hoặc thiếu thư viện numpy/scipy/matplotlib."
+            + detail
+        )
     p = ThamSoGA(kich_thuoc_quan_the=int(pop_size), so_the_he=int(generations))
     designs, histories = [], []
     for k in range(int(runs)):
